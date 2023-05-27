@@ -241,6 +241,7 @@ module Command
               })
         @novel_data = Downloader.get_data_by_target(target)
         @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
+        @options["zip_timestamp_modified"] = @novel_data[NovelSetting.load(target)["title_date_target"]] || Time.now
       end
       return unless res
       array_of_converted_txt_path = res[:converted_txt_paths]
@@ -317,7 +318,7 @@ module Command
     def copy_to_converted_file(src_path, io: $stdout2)
       copy_to_dir = get_copy_to_directory
       return nil unless copy_to_dir
-      FileUtils.copy(src_path, copy_to_dir)
+      FileUtils.copy(src_path, copy_to_dir, {:preserve => true})
       copied_file_path = File.join(copy_to_dir, File.basename(src_path))
       io.puts copied_file_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
       copied_file_path

@@ -23,6 +23,7 @@ class NovelConverter
 
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
   NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
+  NOVEL_TEXT_TEMPLATE_NAME_FOR_AOZORA = "aozora_novel.txt"
 
   attr_reader :use_dakuten_font, :stream_io
 
@@ -457,7 +458,14 @@ class NovelConverter
     processing_title = toc["title"]
     processing_title += "_#{index}" if index
     processed_title = decorate_title(processing_title)
-    template_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    #template_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    if device && device.ibunko?
+      template_name = NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO
+    elsif device && device.aozorazip?
+      template_name = NOVEL_TEXT_TEMPLATE_NAME_FOR_AOZORA
+    else
+      template_name = NOVEL_TEXT_TEMPLATE_NAME
+    end
     Template.get(template_name, binding, 1.1)
   end
 
@@ -652,6 +660,10 @@ class NovelConverter
     array_of_subtitles.each_with_index do |sliced_subtitles, index|
       @converter.subtitles = sliced_subtitles
       html.clear
+      if is_hotentry == false && @setting.slice_size == 1
+        toc["subdate"] = sliced_subtitles[0]["subdate"]
+        toc["subupdate"] = sliced_subtitles[0]["subupdate"]
+      end
       sections = subtitles_to_sections(sliced_subtitles, html)
       array_of_converted_text.push(
         create_novel_text_by_template(
