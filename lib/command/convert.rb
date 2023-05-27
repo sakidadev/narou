@@ -318,7 +318,7 @@ module Command
     def copy_to_converted_file(src_path, io: $stdout2)
       copy_to_dir = get_copy_to_directory
       return nil unless copy_to_dir
-      FileUtils.copy(src_path, copy_to_dir, {:preserve => true})
+      FileUtils.copy(src_path, copy_to_dir, :preserve => true)
       copied_file_path = File.join(copy_to_dir, File.basename(src_path))
       io.puts copied_file_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
       copied_file_path
